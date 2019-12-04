@@ -60,7 +60,6 @@ def main(data_file_names, stats_file_name):
                              str(tot_distinct), str(pred), str(diff)])
 
 
-
 if __name__ == "__main__":
     # default data file names
     data_file_names = ["../unigrams/" + str(i) + ".txt" for i in range(1, 14)]
