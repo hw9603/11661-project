@@ -73,22 +73,22 @@ def plot(ranks, freqs, filename):
     plt.plot(log_ranks, log_freqs_ols)
 
     plt.legend(['Word frequency',
-                'OLS, slope={:0.3f}, offset={:0.3f}, std_err={:0.3f}'.format(k, b, std_err)
+                'OLS, slope={:0.3f}, offset={:0.3f}, r_squared={:0.3f}'.format(k, b, results.rsquared)
                 ],
                loc='upper left')
     plt.savefig('../results/zipfs_law/' + filename.split('/')[-1].split('.')[-2] + '.pdf')
     plt.clf()
-    return std_err, filename_stripped
+    return filename_stripped, std_err, results.mse_resid, results.rsquared
 
 
 def main(data_file_names, stats_file_name):
     with open(stats_file_name, "w+") as f:
         writer = csv.writer(f)
-        writer.writerow(['file_name', 'std_err'])
+        writer.writerow(['file_name', 'std_err', 'mse_resid', 'r_squared'])
         for filename in data_file_names:
             ranks, freqs = get_rank_freq(filename)
-            std_err, filename_stripped = plot(ranks, freqs, filename)
-            writer.writerow([filename_stripped, str(std_err)])
+            filename_stripped, std_err,  mse_resid, r_squared = plot(ranks, freqs, filename)
+            writer.writerow([filename_stripped, str(std_err), str(mse_resid), str(r_squared)])
 
 
 if __name__ == '__main__':
