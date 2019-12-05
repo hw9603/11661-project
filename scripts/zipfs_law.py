@@ -51,7 +51,7 @@ def get_rank_freq(data_file):
 
 def plot(ranks, freqs, filename):
     filename_stripped = filename.split('/')[-1]
-    plt.title(" Word Frequencies in " + filename_stripped)
+    plt.title(filename_stripped)
     plt.ylabel("log frequency")
     plt.xlabel("log rank")
 
@@ -76,7 +76,7 @@ def plot(ranks, freqs, filename):
                 'OLS, slope={:0.3f}, offset={:0.3f}, r_squared={:0.3f}'.format(k, b, results.rsquared)
                 ],
                loc='upper left')
-    plt.savefig('../results/zipfs_law/' + filename.split('/')[-1].split('.')[-2] + '.pdf')
+    plt.savefig('../results/zipfs_law/' + filename.split('/')[-1].split('.')[-2] + '.jpeg')
     plt.clf()
     return filename_stripped, std_err, results.mse_resid, results.rsquared
 
