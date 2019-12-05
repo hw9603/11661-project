@@ -1,5 +1,6 @@
 import string
 from collections import defaultdict
+import numpy as np
 
 def read_data(filename):
     data = []
@@ -40,3 +41,13 @@ def ngram2wordfreq(ngrams):
         wordfreq[ngram] += 1
         total_counts += 1
     return wordfreq, total_counts
+
+def gen_ngram_label(ngrams):
+    X = []
+    y = []
+    for ngram in ngrams:
+        label = ngram.split(" ")[-1]
+        prev = ngram.split(" ")[:-1]
+        X.append(prev)
+        y.append(label)
+    return np.array(X), np.array(y)
