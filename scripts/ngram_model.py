@@ -61,7 +61,7 @@ def main(folder_file_name):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print("Usage: python entropy.py [FOLDER|FILENAME]")
+        print("Usage: python ngram_model.py [FOLDER|FILENAME]")
         exit(1)
     folder_file_name = sys.argv[1]
     main(folder_file_name)
