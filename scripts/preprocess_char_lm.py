@@ -14,7 +14,7 @@ def make_sequence(file_name, encode_dic, dest_file_name):
                 temp.append(str(encode_dic[char]))
                 if len(temp) == sequence_len:
                     dest_file.write(" ".join(temp) + "\n")
-                    temp = []
+                    temp = temp[1:]
     dest_file.close()
 
 
