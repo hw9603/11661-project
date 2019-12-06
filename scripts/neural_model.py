@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import sys
 import utils
+import random
 from keras.utils import to_categorical
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Sequential
@@ -10,6 +11,12 @@ from keras.layers import LSTM, Dense, GRU, Embedding
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import train_test_split
 
+def write_to_stats(outfile, filename, orig_res, shuffled_res):
+    with open(outfile, "a") as f:
+        line = filename.split("/")[-1]
+        line += "\t" + str(orig_res[0]) + "\t" + str(orig_res[1]) + "\t" + str(orig_res[2])
+        line += "\t" + str(shuffled_res[0]) + "\t" + str(shuffled_res[1]) + "\t" + str(shuffled_res[2])
+        f.write(line + "\n")
 
 def build_model(X_train, y_train, vocab):
     # define the model
@@ -41,31 +48,39 @@ def predict_on_test(X_test, y_test, model, vocab):
             correct += 1
     print("Total: {}, correct: {}({}%)"
           .format(total, correct, correct / total * 100))
+    return total, correct, correct / total * 100
 
-def neural_model_eval_pipeline(filename, vocab):
+def neural_model_eval_pipeline(filename, vocab, outfile):
     X, y = utils.read_sequence(filename, vocab)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05,
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
                                                         random_state=42)
     model = build_model(X_train, y_train, vocab)
-    predict_on_test(X_test, y_test, model, vocab)
+    orig_res = predict_on_test(X_test, y_test, model, vocab)
     random.shuffle(y_test)
-    predict_on_test(X_test, y_test, model, vocab)
+    shuffled_res = predict_on_test(X_test, y_test, model, vocab)
+    write_to_stats(outfile, filename, orig_res, shuffled_res)
 
 
-def main(folder_file_name, mapping_name):
+def main(folder_file_name, mapping_name, outpath="results/neural/"):
     if os.path.isfile(folder_file_name):
         mapping = utils.get_mapping(mapping_name)
         vocab = len(mapping) + 1
+        outfile = os.path.join(outpath, "stats.csv")
         print("=" * 5 + folder_file_name + "=" * 5)
-        neural_model_eval_pipeline(folder_file_name, vocab)
+        with open(outfile, "a+") as f:
+            f.write("file\ttotal\tacc\tacc_perc\ts_total\ts_acc\ts_acc_perc\n")
+        neural_model_eval_pipeline(folder_file_name, vocab, outfile)
     elif os.path.isdir(folder_file_name):
         for filename in os.listdir(folder_file_name):
             filename = os.path.join(folder_file_name, filename)
             mapping = utils.get_mapping(os.path.join(mapping_name,
                                                      filename.split("/")[-1]))
             vocab = len(mapping) + 1
+            outfile = os.path.join(outpath, "stats.csv")
             print("=" * 5 + filename + "=" * 5)
-            neural_model_eval_pipeline(filename, vocab)
+            with open(outfile, "a+") as f:
+                f.write("file\ttotal\tacc\tacc_perc\ts_total\ts_acc\ts_acc_perc\n")
+            neural_model_eval_pipeline(filename, vocab, outfile)
 
 
 if __name__ == '__main__':
