@@ -7,8 +7,7 @@ import random
 from keras.utils import to_categorical
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Sequential
-from keras.layers import LSTM, Dense, GRU, Embedding
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.layers import Dense, GRU, Embedding
 from sklearn.model_selection import train_test_split
 
 def write_to_stats(outfile, filename, orig_res, shuffled_res):
@@ -19,15 +18,11 @@ def write_to_stats(outfile, filename, orig_res, shuffled_res):
         f.write(line + "\n")
 
 def build_model(X_train, y_train, vocab):
-    # define the model
     model = Sequential()
     model.add(Embedding(vocab, 50, input_length=30, trainable=True))
     model.add(GRU(150, recurrent_dropout=0.1, dropout=0.1))
     model.add(Dense(vocab, activation='softmax'))
-    # print(model.summary())
-    # compile the model
     model.compile(loss='categorical_crossentropy', metrics=['acc'], optimizer='adam')
-    # fit the model
     model.fit(X_train, y_train, epochs=30, verbose=2, validation_split=0.1)
     return model
 
